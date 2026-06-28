@@ -120,7 +120,8 @@ def cargar_grafo_desde_csv(ruta_archivo: str) -> Grafo:
 def ejecutar_modulo_comparativo(ruta_csv: str) -> None:
     """
     Ejecuta el experimento de comparación de rendimiento (Fuerza Bruta vs Voraz)
-    para diferentes tamaños de nodos e imprime la tabla comparativa por consola.
+    para diferentes tamaños de nodos, imprime la tabla comparativa por consola
+    y guarda los resultados en data/resultados.csv.
     """
     print("\n" + "=" * 115)
     print(" INICIANDO PRUEBA DE RENDIMIENTO COMPARATIVA: FUERZA BRUTA VS ALGORITMO VORAZ ".center(115, "="))
@@ -136,6 +137,8 @@ def ejecutar_modulo_comparativo(ruta_csv: str) -> None:
     print(separador_tabla)
     print(formato_fila.format("Nodos (N)", "Costo Ruta (FB)", "Tiempo Ejec. FB (s)", "Costo Ruta (Voraz)", "Tiempo Ejec. Voraz (s)"))
     print(separador_tabla)
+    
+    resultados_lista = []
     
     for n in tamanos:
         # Generar datos temporales para el experimento con n nodos
@@ -171,6 +174,9 @@ def ejecutar_modulo_comparativo(ruta_csv: str) -> None:
             # Imprimir fila con resultados
             print(formato_fila.format(n, costo_fb_str, tiempo_fb_str, costo_voraz_str, tiempo_voraz_str))
             
+            # Guardar para el archivo CSV
+            resultados_lista.append([n, costo_fb_str, tiempo_fb_str, costo_voraz_str, tiempo_voraz_str])
+            
         except Exception as e:
             print(f"| Error en tamaño {n:<6} | Ocurrió un error inesperado al procesar: {str(e):<71} |")
         finally:
@@ -179,6 +185,18 @@ def ejecutar_modulo_comparativo(ruta_csv: str) -> None:
                 os.remove(ruta_temporal)
                 
     print(separador_tabla)
+    
+    # Escribir los resultados en data/resultados.csv
+    ruta_resultados = os.path.join(os.path.dirname(ruta_csv), "resultados.csv")
+    try:
+        with open(ruta_resultados, mode="w", newline="", encoding="utf-8") as f_res:
+            escritor = csv.writer(f_res)
+            escritor.writerow(["Nodos", "Costo Fuerza Bruta", "Tiempo Fuerza Bruta (s)", "Costo Voraz", "Tiempo Voraz (s)"])
+            escritor.writerows(resultados_lista)
+        print(f"[OK] Tabla de resultados comparativos guardada en: {ruta_resultados}")
+    except Exception as e:
+        print(f"[ERROR] No se pudo guardar el archivo de resultados: {e}")
+        
     print("Nota: El enfoque de Fuerza Bruta no se ejecuta para N > 10 debido a que requiere O(N!) operaciones,")
     print("      lo cual colapsaría la memoria y el procesador de la máquina de demostración en tiempo de exposición.")
     print("=" * 115 + "\n")

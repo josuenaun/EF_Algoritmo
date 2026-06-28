@@ -1,0 +1,50 @@
+CASOS DE PRUEBA Y VALIDACIÓN DEL SISTEMA
+========================================
+
+Este archivo documenta los escenarios clave utilizados para verificar la correctitud teórica y la robustez del sistema de optimización de rutas.
+
+Caso de Prueba 1: Grafo Mínimo Conexo (4 Nodos)
+---------------------------------------------
+* Propósito: Comprobar la correctitud de ambos algoritmos en un escenario pequeño y controlable.
+* Nodos: Depósito, A, B, C.
+* Conexiones y Distancias:
+  - Depósito - A: 10.0 km
+  - Depósito - B: 15.0 km
+  - Depósito - C: 20.0 km
+  - A - B: 35.0 km
+  - A - C: 25.0 km
+  - B - C: 30.0 km
+* Resultados Esperados:
+  - Ruta de Fuerza Bruta: Depósito -> A -> C -> B -> Depósito (Costo: 80.0 km)
+  - Ruta Voraz (Vecino Más Cercano): Depósito -> A -> C -> B -> Depósito (Costo: 80.0 km)
+* Verificación: Ambos algoritmos logran el óptimo global con costo exacto de 80.0 km.
+
+Caso de Prueba 2: Límite del Cómputo Exacto (10 Nodos)
+-----------------------------------------------------
+* Propósito: Evidenciar el impacto del crecimiento factorial del tiempo en Fuerza Bruta.
+* Nodos: Depósito, Punto_1, Punto_2, ..., Punto_9 (10 puntos).
+* Geometría: Coordenadas 2D aleatorias en plano de 100x100.
+* Resultados Esperados:
+  - Fuerza Bruta encuentra la ruta óptima absoluta de costo aproximado (ej. 239.62 km).
+  - Tiempo de Fuerza Bruta: ~0.8 a 1.2 segundos (por la evaluación de 362,880 permutaciones).
+  - Algoritmo Voraz encuentra una ruta aproximada de costo ligeramente mayor (ej. 278.15 km).
+  - Tiempo del Algoritmo Voraz: < 0.0001 segundos.
+* Verificación: Demuestra el "Gap" o margen de error del algoritmo voraz (~16%) frente a la inmensa ganancia en velocidad (más de 40,000 veces más rápido).
+
+Caso de Prueba 3: Escalabilidad Masiva (100 Nodos)
+-------------------------------------------------
+* Propósito: Demostrar que el algoritmo Voraz puede procesar volúmenes industriales y que Fuerza Bruta es inviable.
+* Nodos: Depósito y 99 puntos de entrega (100 puntos en total).
+* Resultados Esperados:
+  - Fuerza Bruta: No ejecutable. Se cancela automáticamente en el código para evitar que el procesador se cuelgue por la explosión combinatoria (100! es mayor que la cantidad de átomos en el universo).
+  - Algoritmo Voraz: Resuelve de forma instantánea en menos de 2 milisegundos (< 0.002 s).
+* Verificación: Valida la viabilidad comercial y la escalabilidad asintótica O(N^2) del algoritmo voraz en escenarios reales.
+
+Caso de Prueba 4: Grafo No Conexo (Manejo de Errores)
+----------------------------------------------------
+* Propósito: Asegurar la estabilidad del software ante inconsistencias lógicas en el mapa de calles.
+* Nodos: Depósito, A, B (donde B no tiene aristas que lo conecten con el resto del grafo).
+* Resultados Esperados:
+  - Ambos algoritmos deben identificar que no existe un ciclo Hamiltoniano completo factible.
+  - Retornan una lista vacía de ruta [] y costo igual a infinito (math.inf).
+* Verificación: El sistema maneja el error de forma controlada y elegante sin generar excepciones inesperadas que congelen la consola.
